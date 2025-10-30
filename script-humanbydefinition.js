@@ -1,7 +1,8 @@
+
 /**
- * @name [textmode.js] Plasma Field Pumpkin
- * @description A colorful plasma field effect in the shape of a pumpkin using multiple sine waves.
- * @author trintler (pumpkin), rest: humanbydefinition
+ * @name [textmode.js] Plasma Field
+ * @description A colorful plasma field effect using multiple sine waves.
+ * @author humanbydefinition
  * @link https://github.com/humanbydefinition/textmode.js
  */
 
@@ -12,35 +13,6 @@ const tm = textmode.create({
     fontSize: 16
 });
 
-// Function to check if a point is inside a pumpkin shape
-function isInsidePumpkin(x, y, width, height) {
-    // Normalize coordinates to center
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const nx = (x - centerX) / (width * 0.3);
-    const ny = (y - centerY) / (height * 0.35);
-    
-    // Create pumpkin body (main oval with ridges)
-    const bodyRadius = 1.0;
-    const bodyDistance = Math.sqrt(nx * nx + ny * ny * 1.2);
-    
-    // Add vertical ridges to make it look more pumpkin-like
-    const ridges = Math.sin(Math.atan2(ny, nx) * 8) * 0.1;
-    const pumpkinBody = bodyDistance <= (bodyRadius + ridges);
-    
-    // Create pumpkin stem (small rectangle at top)
-    const stemWidth = 0.08;
-    const stemHeight = 0.15;
-    const stemX = Math.abs(nx) <= stemWidth;
-    const stemY = ny >= -1.2 && ny <= -1.0;
-    const stem = stemX && stemY;
-    
-    // Create pumpkin segments (vertical lines)
-    const segmentLines = Math.abs(Math.sin(Math.atan2(ny, nx) * 4)) > 0.9;
-    
-    return pumpkinBody || stem;
-}
-
 tm.draw(() => {
     tm.background(0);
 
@@ -48,11 +20,6 @@ tm.draw(() => {
     
     for (let y = 0; y < tm.grid.rows; y++) {
         for (let x = 0; x < tm.grid.cols; x++) {
-            // Check if current position is inside pumpkin shape
-            if (!isInsidePumpkin(x, y, tm.grid.cols, tm.grid.rows)) {
-                continue; // Skip if outside pumpkin shape
-            }
-            
             tm.push();
             
             // Normalize coordinates
@@ -69,29 +36,10 @@ tm.draw(() => {
             const combined = (plasma1 + plasma2 + plasma3 + plasma4) / 4;
             const intensity = (combined + 1) / 2; // Normalize to 0-1
             
-            // Create orange/yellow pumpkin colors instead of rainbow
-            const centerX = tm.grid.cols / 2;
-            const centerY = tm.grid.rows / 2;
-            const distanceFromCenter = Math.sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY));
-            const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-            
-            // Orange to yellow gradient based on intensity and position
-            let hue, saturation, lightness;
-            
-            // Check if in stem area
-            const stemArea = Math.abs(x - centerX) <= tm.grid.cols * 0.024 && y <= centerY - tm.grid.rows * 0.25;
-            
-            if (stemArea) {
-                // Green/brown for stem
-                hue = 0.25 + intensity * 0.1; // Green-ish
-                saturation = 0.6 + intensity * 0.4;
-                lightness = 0.3 + intensity * 0.4;
-            } else {
-                // Orange/yellow for pumpkin body
-                hue = 0.08 + intensity * 0.1; // Orange to yellow
-                saturation = 0.8 + intensity * 0.2;
-                lightness = 0.4 + intensity * 0.4;
-            }
+            // Create rainbow color cycling
+            const hue = (intensity + time * 0.5) % 1;
+            const saturation = 1.0;
+            const lightness = intensity;
             
             // Convert HSL to RGB
             const hsl2rgb = (h, s, l) => {
