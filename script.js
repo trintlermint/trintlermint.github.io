@@ -118,15 +118,15 @@ tm.draw(() => {
             
             // Map intensity to characters
             if (intensity > 0.8) {
-                tm.char('█');
+                tm.char('Ü');
             } else if (intensity > 0.6) {
-                tm.char('▓');
+                tm.char(')');
             } else if (intensity > 0.4) {
-                tm.char('▒');
+                tm.char('u');
             } else if (intensity > 0.2) {
-                tm.char('░');
+                tm.char(',');
             } else if (intensity > 0.1) {
-                tm.char('·');
+                tm.char('-');
             } else {
                 tm.char(' ');
             }
